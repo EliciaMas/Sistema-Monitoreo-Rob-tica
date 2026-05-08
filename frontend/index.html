@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard de Monitoreo - Robótica</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1a1a1a; color: #ffffff; text-align: center; padding: 20px; }
+        table { margin: 20px auto; border-collapse: collapse; width: 90%; background-color: #2d2d2d; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+        th, td { border: 1px solid #444; padding: 12px; text-align: center; }
+        th { background-color: #007bff; color: white; text-transform: uppercase; }
+        tr:nth-child(even) { background-color: #383838; }
+        tr:hover { background-color: #444; }
+        .status-on { color: #28a745; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Logs del Sistema Robótico (HC-05)</h1>
+    <p>Estado del Servidor: <span class="status-on">EN LÍNEA</span></p>
+    
+    <table id="tabla-logs">
+        <thead>
+            <tr>
+                <th>Fecha y Hora</th>
+                <th>Acción Detectada</th>
+                <th>Detalles del Sensor</th>
+            </tr>
+        </thead>
+        <tbody id="cuerpo-tabla">
+            </tbody>
+    </table>
+
+    <script>
+        async function actualizarDashboard() {
+            try {
+                // Cuando tengas tu IP pública, reemplaza 'localhost'
+                const respuesta = await fetch('http://localhost:5000/api/logs');
+                const eventos = await respuesta.json();
+                
+                const tabla = document.getElementById('cuerpo-tabla');
+                tabla.innerHTML = eventos.map(e => `
+                    <tr>
+                        <td>${e.timestamp}</td>
+                        <td>${e.accion}</td>
+                        <td>${e.detalles}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error("Error conectando con el Backend:", error);
+            }
+        }
+
+        // Refrescar cada 2 segundos para ver cambios en tiempo real
+        setInterval(actualizarDashboard, 2000);
+        actualizarDashboard();
+    </script>
+</body>
+</html>
